@@ -14,10 +14,6 @@ service_id = ""
   post_init = "npm install"
 
 [local_server]
-  [local_server.backends]
-    [local_server.backends.open-meteo]
-      url = "https://api.open-meteo.com"
-
   [local_server.config_stores]
     [local_server.config_stores.config_default]
       format = "inline-toml"
@@ -25,7 +21,13 @@ service_id = ""
       LOG_LEVEL = "debug"
 
   [local_server.secret_stores]
+    # API tokens for local development (fastly compute serve).
+    # In production, store the same keys in the Fastly Secret Store linked to this service.
+    # Each upstream API has its own token — see SECRETS in src/lib/api-client.js.
     [[local_server.secret_stores.secret_default]]
-      key = "API_TOKEN"
-      data = "helloworld"
+      key = "CATALOG_API_TOKEN"
+      data = "catalog-tutorial-token"
+    [[local_server.secret_stores.secret_default]]
+      key = "DELIVERY_API_TOKEN"
+      data = "delivery-tutorial-token"
 

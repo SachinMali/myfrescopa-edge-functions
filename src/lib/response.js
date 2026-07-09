@@ -12,7 +12,46 @@ governing permissions and limitations under the License.
 
 /// <reference types="@fastly/js-compute" />
 
-const notFound = () => new Response("Not Found!", { status: 404 });
-const error = () => new Response("Internal Server Error", { status: 500 });
+const JSON_HEADERS = {
+  "content-type": "application/json; charset=utf-8",
+  "cache-control": "no-store",
+};
 
-export { notFound, error };
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data, null, 2), {
+    status,
+    headers: JSON_HEADERS,
+  });
+}
+
+function notFound() {
+  return json(
+    {
+      error: "Not found",
+      code: "NOT_FOUND",
+    },
+    404,
+  );
+}
+
+function methodNotAllowed() {
+  return json(
+    {
+      error: "Method not allowed",
+      code: "METHOD_NOT_ALLOWED",
+    },
+    405,
+  );
+}
+
+function error() {
+  return json(
+    {
+      error: "Internal server error",
+      code: "INTERNAL_ERROR",
+    },
+    500,
+  );
+}
+
+export { json, notFound, methodNotAllowed, error };
