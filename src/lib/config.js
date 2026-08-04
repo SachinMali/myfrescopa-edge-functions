@@ -12,6 +12,9 @@ governing permissions and limitations under the License.
 
 /// <reference types="@fastly/js-compute" />
 
+// Reads secrets from Fastly Secret Store at the edge.
+// Used by lib/api-client.js — handlers and mocks never import this directly.
+
 import { SecretStore } from 'fastly:secret-store';
 
 export class SecretStoreManager {

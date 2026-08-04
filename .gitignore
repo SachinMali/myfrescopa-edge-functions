@@ -4,6 +4,9 @@ deploy
 # aio
 .aio
 
+# Cursor
+.cursor
+
 # system
 .DS_Store
 .DS_Store?

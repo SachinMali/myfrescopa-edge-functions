@@ -3,8 +3,8 @@ version: '1'
 data:
   originSelectors:
     rules:
-      - name: route-weather-to-edge-function
-        when: { reqProperty: path, equals: "/weather" }
+      - name: route-estimated-delivery-to-edge-function
+        when: { reqProperty: path, equals: "/api/frescopa/estimated-delivery" }
         action:
           type: selectAemOrigin
           originName: edgefunction-my-edge-function

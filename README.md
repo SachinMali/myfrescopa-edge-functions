@@ -14,6 +14,88 @@ This boilerplate serves as an example of what is possible to achieve with AEM Ed
 Functions source code can be found under `./src`, tests can be found under `./test` and are executable through `mocha`.
 The service configuration is defined in `config/edgeFunctions.yaml` and CDN routing in `config/cdn.yaml`.
 
+## Architecture & Request Flow
+
+This section gives a bird's-eye view of how a request moves through the codebase. **`src/index.js` is the entry point** — it matches the URL path and delegates to a handler. Handlers orchestrate upstream API calls; each API loads its own token from the Secret Store.
+
+### End-to-end flow
+
+```
+Browser request
+      ↓
+index.js                    ← entry point: match path → call handler
+      ↓
+handlers/<feature>/handler.js  ← validate input, orchestrate API calls
+      ↓
+mocks/<api>/…-api.js        ← tutorial stand-ins (swap for lib/ clients in production)
+      ↓
+lib/api-client.js             ← getApiToken() + authorizedFetch()
+      ↓
+lib/config.js                 ← reads from Fastly Secret Store
+      ↓
+fastly.toml                   ← local dev token values (fastly compute serve)
+```
+
+### Layer responsibilities
+
+| Layer | Location | Role |
+|-------|----------|------|
+| **Router** | `src/index.js` | Match path + HTTP method, delegate to handler, catch errors |
+| **Handler** | `src/handlers/<feature>/handler.js` | Parse/validate request, call upstream APIs, return response |
+| **API client** | `src/mocks/` (tutorial) or `src/lib/` (production) | Call upstream service; load and attach its API token |
+| **Auth** | `src/lib/api-client.js` | Shared `getApiToken()` and `authorizedFetch()` helpers |
+| **Secrets** | `src/lib/config.js` + Secret Store | Read tokens at runtime — never hardcode in source |
+
+### Project structure
+
+```
+src/
+├── index.js                          # Entry point — route table only
+├── handlers/
+│   └── estimated-delivery/
+│       ├── handler.js                # Orchestrates catalog + fulfillment APIs
+│       ├── responses.js              # Success/error response builders
+│       └── constants.js              # Route, defaults, param docs
+├── mocks/                            # Tutorial stand-ins — replace in production
+│   ├── catalog/product-api.js        # Mock catalog API
+│   └── delivery/delivery-api.js      # Mock delivery API
+└── lib/                              # Shared, production-ready utilities
+    ├── api-client.js                 # Token loading + authorized fetch
+    ├── config.js                     # Secret Store access
+    ├── response.js                   # JSON error helpers
+    └── log.js                        # Request/response logging
+```
+
+### Example: estimated delivery endpoint
+
+`GET /api/frescopa/estimated-delivery?postcode=90210&sku=house-blend-medium-roast`
+
+1. **`index.js`** matches the path and calls `estimatedDeliveryBySkuAndPostcodeHandler`.
+2. **`handlers/estimated-delivery/handler.js`** validates `postcode`, then calls two upstream APIs:
+   - **Catalog API** → `mocks/catalog/product-api.js` (token: `CATALOG_API_TOKEN`)
+   - **Fulfillment API** → `mocks/delivery/delivery-api.js` (token: `DELIVERY_API_TOKEN`)
+3. Each mock loads its own token via `lib/api-client.js` before returning demo data.
+4. The handler merges both results into a single JSON response.
+
+Handlers never touch secrets directly — each API client is responsible for loading its own token.
+
+### API tokens (one per upstream service)
+
+| Secret Store key | Used by | Purpose |
+|------------------|---------|---------|
+| `CATALOG_API_TOKEN` | `mocks/catalog/product-api.js` | Catalog / product lookup |
+| `DELIVERY_API_TOKEN` | `mocks/delivery/delivery-api.js` | Estimated delivery / fulfillment |
+
+Local development values are in `fastly.toml` under `[local_server.secret_stores]`. In production, define the same keys in your Edge Functions secrets configuration (see [Edge Function Secrets](#edge-function-secrets)).
+
+### Adding a new endpoint
+
+1. Create `src/handlers/<feature>/handler.js`
+2. Add mock or real API client under `src/mocks/` or `src/lib/`
+3. Register a new secret key in `lib/api-client.js` if the API needs its own token
+4. Add a route in `src/index.js`
+5. Add CDN origin selector rule in `config/cdn.yaml`
+
 ## Setup
 
 ### Adobe CLI
