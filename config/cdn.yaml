@@ -15,3 +15,27 @@ data:
           type: selectAemOrigin
           originName: edgefunction-my-edge-function
           skipCache: true
+    authentication:
+      authenticators:
+        - type: oidc
+          name: frescopa-google-oidc
+          clientId: "585724821762-fvi7h3ggmsnjk03qn07ot57o9tdm0akl.apps.googleusercontent.com"
+          clientSecret: ${{FRESCOPA_OIDC_CLIENT_SECRET}}
+          authEndpoint: "https://accounts.google.com/o/oauth2/v2/auth"
+          tokenEndpoint: "https://oauth2.googleapis.com/token"
+          jwksUri: "https://www.googleapis.com/oauth2/v3/certs"
+          issuer: "https://accounts.google.com"
+          domainMatch: "^dev-myfrescopa\\.enablementadobe\\.com$"
+          callback: /callback
+          login: /login
+          logout: /logout
+          logoutTarget: /signed-out
+      rules:
+        - name: frescopa-members-rule
+          when:
+            allOf:
+              - { reqProperty: domain, equals: "dev-myfrescopa.enablementadobe.com" }
+              - { reqProperty: path, matches: "^/members/.*" }
+          action:
+            type: authenticate
+            authenticator: frescopa-google-oidc
