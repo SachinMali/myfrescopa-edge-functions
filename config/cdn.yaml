@@ -28,6 +28,7 @@ data:
         domainMatch: "^dev-myfrescopa\\.enablementadobe\\.com$"
         callback: /callback
         login: /login
+        loginTarget: /dev/branches/oidc/members/welcome
         logout: /logout
         logoutTarget: /signed-out
     rules:
