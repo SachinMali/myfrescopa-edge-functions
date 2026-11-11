@@ -30,7 +30,7 @@ data:
         login: /login
         loginTarget: /dev/branches/oidc/members/welcome
         logout: /logout
-        logoutTarget: /signed-out
+        logoutTarget: /dev/branches/oidc/sign-out
     rules:
       - name: frescopa-members-rule
         when:
