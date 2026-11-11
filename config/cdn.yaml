@@ -35,7 +35,7 @@ data:
         when:
           allOf:
             - { reqProperty: domain, equals: "dev-myfrescopa.enablementadobe.com" }
-            - { reqProperty: path, matches: "^/members/.*" }
+            - { reqProperty: path, matches: "^(/dev/branches/[^/]+)?/members/.*" }
         action:
           type: authenticate
           authenticator: frescopa-google-oidc
