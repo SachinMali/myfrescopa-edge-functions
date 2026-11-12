@@ -46,7 +46,7 @@ data:
         when:
           allOf:
             - { reqProperty: domain, equals: "dev-myfrescopa.enablementadobe.com" }
-            - { reqProperty: path, equals: /private/email }
+            - { reqProperty: path, equals: /members/email }
         action:
           type: respond
           status: 200
@@ -57,7 +57,7 @@ data:
         when:
           allOf:
             - { reqProperty: domain, equals: "dev-myfrescopa.enablementadobe.com" }
-            - { reqProperty: path, equals: /private/idtoken }
+            - { reqProperty: path, equals: /members/idtoken }
         action:
           type: respond
           status: 200
