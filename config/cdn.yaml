@@ -50,4 +50,4 @@ data:
           type: respond
           status: 200
           body:
-            authProperty: oidcIdToken     # decoded JWT payload from the _aem_oidc_id_token cookie          
+            authProperty: oidcUserEmail     # decoded JWT payload from the _aem_oidc_id_token cookie          
