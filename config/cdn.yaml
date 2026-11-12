@@ -41,13 +41,25 @@ data:
         action:
           type: authenticate
           authenticator: frescopa-google-oidc
-      - name: frescopa-idtoken
+      # oidcUserEmail decodes the JWT payload from the _aem_oidc_id_token cookie.
+      - name: frescopa-respond-with-user-email
         when:
           allOf:
             - { reqProperty: domain, equals: "dev-myfrescopa.enablementadobe.com" }
-            - { reqProperty: path, equals: /idtoken }
+            - { reqProperty: path, equals: /private/email }
         action:
           type: respond
           status: 200
           body:
-            authProperty: oidcUserEmail     # decoded JWT payload from the _aem_oidc_id_token cookie          
+            authProperty: oidcUserEmail
+      # oidcIdToken decodes the JWT payload from the _aem_oidc_id_token cookie.
+      - name: frescopa-respond-with-id-token
+        when:
+          allOf:
+            - { reqProperty: domain, equals: "dev-myfrescopa.enablementadobe.com" }
+            - { reqProperty: path, equals: /private/idtoken }
+        action:
+          type: respond
+          status: 200
+          body:
+            authProperty: oidcIdToken
