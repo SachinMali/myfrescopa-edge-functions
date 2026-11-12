@@ -31,6 +31,7 @@ data:
         loginTarget: /dev/branches/oidc/members/welcome
         logout: /logout
         logoutTarget: /dev/branches/oidc/sign-out
+        additionalScopes: [profile]   # base is openid + email; adds name, given_name, family_name, picture
     rules:
       - name: frescopa-members-rule
         when:
@@ -40,3 +41,13 @@ data:
         action:
           type: authenticate
           authenticator: frescopa-google-oidc
+      - name: frescopa-idtoken
+        when:
+          allOf:
+            - { reqProperty: domain, equals: "dev-myfrescopa.enablementadobe.com" }
+            - { reqProperty: path, equals: /idtoken }
+        action:
+          type: respond
+          status: 200
+          body:
+            authProperty: oidcIdToken     # decoded JWT payload from the _aem_oidc_id_token cookie          
