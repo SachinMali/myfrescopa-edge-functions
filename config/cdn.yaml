@@ -17,8 +17,8 @@ data:
           skipCache: true
   authentication:
     authenticators:
-      - type: oidc
-        name: frescopa-google-oidc
+      - name: frescopa-google-oidc
+        type: oidc        
         clientId: "585724821762-fvi7h3ggmsnjk03qn07ot57o9tdm0akl.apps.googleusercontent.com"
         clientSecret: ${{FRESCOPA_OIDC_CLIENT_SECRET}}
         authEndpoint: "https://accounts.google.com/o/oauth2/v2/auth"
